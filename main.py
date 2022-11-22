@@ -1,9 +1,12 @@
 import os
 import subprocess
+import re
 
 from tkinter import *
 from tkinter import ttk
 from tkinter import filedialog
+
+profile_names = ["TOP", "BOTTOM", "BOTH"]
 
 root = Tk()
 root.title("AutoCrop")
@@ -27,11 +30,28 @@ def select_directory():
   )
   print(dir)
   for x in os.listdir(dir):
-    if x.endswith(".html"):
+    if x.endswith(".cr2"):
         count = count + 1
   cr2_count.set(count)
   print(cr2_count.get())
+  # escaped_dir = re.escape(dir)
   selectedDirStr.set(dir)
+  tiff_dir = "tiffs"
+  jpeg_dir = "jpegs"
+  tiff_path = os.path.join(dir, tiff_dir)
+  jpeg_path = os.path.join(dir, jpeg_dir)
+  os.makedirs(tiff_path)
+  os.makedirs(jpeg_path)
+
+def run_autocropper():
+  print("Processing...")
+  target_path = selectedDirStr.get()
+  selected_profile = profile_names[0]
+
+  full_call = "/Users/ks/proj/vesuvianite/build/apps/app '{}' {}".format(target_path, selected_profile)
+  # selected_profile = profile_names[selected_profile.get()]
+  print(full_call)
+  subprocess.call(full_call, shell=True)
 
 # row section 30 -------------------------------------------------
 ttk.Label(frm, text="Choose Directory").grid(column=0, row=30, padx=5, pady=10, sticky=W)
@@ -52,12 +72,12 @@ ttk.Label(frm, text="Select Profile Targets").grid(column=0, row=51, padx=5, pad
 
 selected_profile = IntVar()
 Radiobutton(frm, text="TOP", variable=selected_profile, value=0).grid(column=0, row=52, sticky=W)
-Radiobutton(frm, text="BOTTOM", variable=selected_profile, value=1).grid(column=0, row=53, sticky=W)
-Radiobutton(frm, text="BOTH", variable=selected_profile, value=2).grid(column=0, row=54, sticky=W)
+# Radiobutton(frm, text="BOTTOM", variable=selected_profile, value=1).grid(column=0, row=53, sticky=W)
+# Radiobutton(frm, text="BOTH", variable=selected_profile, value=2).grid(column=0, row=54, sticky=W)
 
 
 # row section 100 -------------------------------------------------
-ttk.Button(frm, text="RUN", command=root.destroy).grid(column=0, row=100, pady=10)
+ttk.Button(frm, text="RUN", command=run_autocropper).grid(column=0, row=100, pady=10)
 
 ttk.Button(frm, text="Quit", command=root.destroy).grid(column=1, row=100, pady=10)
 
